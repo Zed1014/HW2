@@ -3,17 +3,16 @@ function [CC, MSE, R2, prediction] = myKalman_predict(kalman, testX, testY)
     %初始化估计矩阵
     m = size(testY,1);
     prediction=zeros(m,size(testX,3));
-    prediction(:,1) = [0;0;0]; % 10*(rand(2,1)-0.5); % testY(:,1); % 
+    prediction(:,1) = [0;0;0]; % 10*(rand(2,1)-0.5); % testY(:,1); %
     %prediction(:,1) =testY(:,1);
     P = zeros(m);
     
     for j=2:size(testX,2)
-        Xn=kalman.A*prediction(:,j-1);%一步预测   上一时刻的最优估计
-        P_=kalman.A*P*kalman. A'+kalman.Q;%一步预测误差方差阵   当前先验估计误差的协方差
-        %一步预测误差方差阵
-        K=P_*kalman.H'*pinv(kalman.H*P_*kalman.H'+kalman.R);%滤波增益矩阵（权重）
-        prediction(:,j)=Xn+K*(testX(:,j)-kalman.H*Xn);%状态误差方差阵估计   用这一时刻的先验估计、观测值、卡曼增益得到这一时刻的最优估计
-        P=(eye(m)-K*kalman.H)*P_;   %用这一时刻的kalman增益和先验估计误差的协方差更新后验估计误差
+        Xn=kalman.A*prediction(:,j-1);
+        P_=kalman.A*P*kalman. A'+kalman.Q;
+        K=P_*kalman.H'*pinv(kalman.H*P_*kalman.H'+kalman.R);
+        prediction(:,j)=Xn+K*(testX(:,j)-kalman.H*Xn);
+        P=(eye(m)-K*kalman.H)*P_;   
     end 
      x_cc=corrcoef(testY(1,:),prediction(1,:));
      y_cc=corrcoef(testY(2,:),prediction(2,:));
